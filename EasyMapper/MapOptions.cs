@@ -1,6 +1,6 @@
 ﻿namespace EasyMapper
 {
-    public sealed class MapOptions
+    public class MapOptions
     {
         /// <summary>
         /// <see href="EN"/> : Indicates which sub-level should be descended from the sub-assets. | 
@@ -12,19 +12,26 @@
         /// <see href="EN"/> : Fields that should not match. | 
         /// <see href="TR"/> : Eşleşmemesi gereken alanlar.
         /// </summary>
-        public string[] IgnoreFields { get; set; } = new string[0];
+        private string[] IgnoreFields { get; set; } = new string[0];
 
         public MapOptions(GenerationLevel generationLevel, params string[] ignoreFields)
         {
             GenerationLevel = generationLevel;
             IgnoreFields = ignoreFields;
         }
+        public MapOptions() { }
+
+        private void DefaultOptions(out GenerationLevel level, out string[] ignoreds)
+        {
+            level = GenerationLevel.First;
+            ignoreds = new string[0];
+        }
 
         //public static MapOptions GetDefaultOptions()
         //{
-        //    GenerationLevel = GenerationLevel.First;
-        //    IgnoreFields = new string[0];
-        //    return default;
+        //    var mo = new MapOptions();
+        //    DefaultOptions(ref mo.GenerationLevel, ref out mo.IgnoreFields);
+        //    return mo;
         //}
     }
 
@@ -32,5 +39,8 @@
     {
         public static MapOptions GetDefaultOptions()
             => new MapOptions(GenerationLevel.First, new string[0]);
+
+        public static MapOptions GetThirdLevelAndNonIgnoreOptions()
+            => new MapOptions(GenerationLevel.Third, new string[0]);
     }
 }

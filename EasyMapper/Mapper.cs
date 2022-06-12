@@ -76,32 +76,30 @@ namespace EasyMapper
 
         private static TDestination NewInstanceMap<TDestination>(object source, MapOptions options = null)
         {
-            var sourceEntityProperties = source.GetType().GetProperties();
             var destinationInstance = GetInstanceBy<TDestination>(typeof(TDestination).AssemblyQualifiedName);
-            destinationInstance = (TDestination)MapEntityProperties(sourceEntityProperties, source, destinationInstance, null, false, options);
+            destinationInstance = (TDestination)MapEntityProperties(source, destinationInstance, null, false, options);
             return destinationInstance;
         }
 
         private static object NewInstanceMap(object source, Type destionationType, Type secondDestionationType = null, MapOptions options = null, GenerationLevel innerLevel = GenerationLevel.First)
         {
-            var sourceEntityProperties = source.GetType().GetProperties();
             var destinationInstance = TryCreateInstance(destionationType, secondDestionationType);
-            destinationInstance = MapEntityProperties(sourceEntityProperties, source, destinationInstance, destionationType, false, options, innerLevel);
+            destinationInstance = MapEntityProperties(source, destinationInstance, destionationType, false, options, innerLevel);
             return destinationInstance;
         }
 
         private static TDestination ValuesUpdateMap<TDestination>(object source, TDestination destinationInstance, MapOptions options = null)
         {
-            var sourceEntityProperties = source.GetType().GetProperties();
             var newDestinationInstance = GetInstanceBy<TDestination>(destinationInstance.GetType().AssemblyQualifiedName);
             newDestinationInstance = NewInstanceMap<TDestination>(destinationInstance, options);
-            newDestinationInstance = (TDestination)MapEntityProperties(sourceEntityProperties, source, newDestinationInstance, isUpdateMap: true, options: options);
+            newDestinationInstance = (TDestination)MapEntityProperties(source, newDestinationInstance, isUpdateMap: true, options: options);
             return newDestinationInstance;
         }
 
-        private static object MapEntityProperties(PropertyInfo[] sourceProperties, object source, object destionationEntity, Type destionationType = null, bool isUpdateMap = false,
+        private static object MapEntityProperties(object source, object destionationEntity, Type destionationType = null, bool isUpdateMap = false,
             MapOptions options = null, GenerationLevel innerLevel = GenerationLevel.First)
         {
+            var sourceProperties = source.GetType().GetProperties();
             for (int i = 0; i < sourceProperties.Length; i++)
             {
                 var sourceProperty = sourceProperties[i];
@@ -120,7 +118,7 @@ namespace EasyMapper
                 {
                     if (options.GenerationLevel < innerLevel) continue;
                     var innerDestination = Activator.CreateInstance(destinationProperty.PropertyType);
-                    innerDestination = NewInstanceMap(value, destionationType, innerDestination.GetType(), options, ++innerLevel);
+                    innerDestination = NewInstanceMap(value, destionationType, innerDestination.GetType(), options, ++innerLevel); innerLevel--;
                     if (destinationProperty.PropertyType.Name == innerDestination.GetType().Name)
                         destinationProperty.SetValue(destionationEntity, innerDestination); continue;
                 }
@@ -134,7 +132,7 @@ namespace EasyMapper
                     foreach (var sourceItem in sourceValueEnumerable)
                     {
                         var destinationItem = Activator.CreateInstance(destinationProperty.PropertyType.GenericTypeArguments.FirstOrDefault());
-                        destinationItem = NewInstanceMap(sourceItem, destionationType, innerDestinationItemType, options, ++innerLevel);
+                        destinationItem = NewInstanceMap(sourceItem, destionationType, innerDestinationItemType, options, ++innerLevel); innerLevel--;
                         innerDestinationEnumerable.Add(destinationItem);
                     }
                     destinationProperty.SetValue(destionationEntity, innerDestinationEnumerable); continue;

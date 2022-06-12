@@ -22,7 +22,7 @@ namespace Console.TestApp
                 SupplierID = s.SupplierID,
                 CompanyName = s.CompanyName,
                 Product = s.Products.FirstOrDefault(),
-            }).Take(3).ToList();
+            }).ToList();
             categories = query.GetCategoryList();
             products = query.GetProductList();
 
@@ -69,7 +69,9 @@ namespace Console.TestApp
             var categoryList = categories.ToMap<CategoryDto>().ToList(); // Status : 
 
             //------------------
-            var opt = new MapOptions(GenerationLevel.Third, "Id");
+            var opt = new MapOptions(GenerationLevel.Eighth, "Id");
+            var opt2 = MapOption.GetDefaultOptions();
+            var opt3 = MapOptions.GetDefaultOptions();
             // EasyMapping (Single entity Inline Single entity)
             var singleTestDto2 = singleTestEntity.ToMap<SupplierSingleTestDto>(opt); // Status : 
 
