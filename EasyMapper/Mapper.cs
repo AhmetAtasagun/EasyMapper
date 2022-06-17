@@ -10,63 +10,55 @@ namespace EasyMapper
     {
         public static IEnumerable<TDestination> ToMap<TDestination>(this IEnumerable<object> source)
         {
-            var options = MapOption.GetDefaultOptions();
-            var mappedModel = source.Select(s => NewInstanceMap<TDestination>(s, options)).ToList().AsEnumerable();
+            var mappedModel = source.Select(s => NewInstanceMap<TDestination>(s)).ToList().AsEnumerable();
             return mappedModel;
         }
 
         public static TDestination ToMap<TDestination>(this object source)
         {
-            var options = MapOption.GetDefaultOptions();
-            var mappedModel = NewInstanceMap<TDestination>(source, options);
+            var mappedModel = NewInstanceMap<TDestination>(source);
             return mappedModel;
         }
 
         public static TDestination ToMap<TDestination>(this object source, TDestination destination)
         {
-            var options = MapOption.GetDefaultOptions();
-            var mappedModel = ValuesUpdateMap(source, destination, options);
+            var mappedModel = ValuesUpdateMap(source, destination);
             return mappedModel;
         }
 
         public static object ToMap(this object source, Type destionationType)
         {
-            var options = MapOption.GetDefaultOptions();
-            var mappedModel = NewInstanceMap(source, destionationType, options: options);
+            var mappedModel = NewInstanceMap(source, destionationType);
             return mappedModel;
         }
 
-        public static IEnumerable<TDestination> ToMap<TDestination>(this IEnumerable<object> source, MapOptions options = null)
+        public static IEnumerable<TDestination> ToMap<TDestination>(this IEnumerable<object> source, MapOptions options)
         {
-            if (options == null) options = MapOption.GetDefaultOptions();
             var mappedModel = source.Select(s => NewInstanceMap<TDestination>(s, options)).ToList().AsEnumerable();
             return mappedModel;
         }
 
-        public static TDestination ToMap<TDestination>(this object source, MapOptions options = null)
+        public static TDestination ToMap<TDestination>(this object source, MapOptions options)
         {
-            if (options == null) options = MapOption.GetDefaultOptions();
             var mappedModel = NewInstanceMap<TDestination>(source, options);
             return mappedModel;
         }
 
-        public static TDestination ToMap<TDestination>(this object source, TDestination destination, MapOptions options = null)
+        public static TDestination ToMap<TDestination>(this object source, TDestination destination, MapOptions options)
         {
-            if (options == null) options = MapOption.GetDefaultOptions();
             var mappedModel = ValuesUpdateMap(source, destination, options);
             return mappedModel;
         }
 
-        public static object ToMap(this object source, Type destionationType, MapOptions options = null)
+        public static object ToMap(this object source, Type destionationType, MapOptions options)
         {
-            if (options == null) options = MapOption.GetDefaultOptions();
-            var mappedModel = NewInstanceMap(source, destionationType, options: options);
+            var mappedModel = NewInstanceMap(source, destionationType, null, options);
             return mappedModel;
         }
 
         #region Private Process
 
-        public static TEntity GetInstanceBy<TEntity>(string entityQualifiedName)
+        private static TEntity GetInstanceBy<TEntity>(string entityQualifiedName)
         {
             var destinationInstance = Activator.CreateInstance<TEntity>();
             if (destinationInstance.GetType() == typeof(object))
@@ -90,8 +82,8 @@ namespace EasyMapper
 
         private static TDestination ValuesUpdateMap<TDestination>(object source, TDestination destinationInstance, MapOptions options = null)
         {
-            var newDestinationInstance = GetInstanceBy<TDestination>(destinationInstance.GetType().AssemblyQualifiedName);
-            newDestinationInstance = NewInstanceMap<TDestination>(destinationInstance, options);
+            //var newDestinationInstance = GetInstanceBy<TDestination>(destinationInstance.GetType().AssemblyQualifiedName);
+            var newDestinationInstance = NewInstanceMap<TDestination>(destinationInstance, options);
             newDestinationInstance = (TDestination)MapEntityProperties(source, newDestinationInstance, isUpdateMap: true, options: options);
             return newDestinationInstance;
         }
@@ -99,11 +91,12 @@ namespace EasyMapper
         private static object MapEntityProperties(object source, object destionationEntity, Type destionationType = null, bool isUpdateMap = false,
             MapOptions options = null, GenerationLevel innerLevel = GenerationLevel.First)
         {
-            var sourceProperties = source.GetType().GetProperties();
-            for (int i = 0; i < sourceProperties.Length; i++)
+            if (options == null) options = new MapOptions().GetDefaultOptions();
+            PropertyInfo[] sourceProperties = source.GetType().GetProperties();
+            foreach (var sourceProperty in sourceProperties)
             {
-                var sourceProperty = sourceProperties[i];
                 var currentPropertyName = sourceProperty.Name;
+                if (options.IgnoreFields.Contains(currentPropertyName)) continue;
                 var value = GetPropertyValue(source, currentPropertyName);
                 if (value is null)
                     continue;

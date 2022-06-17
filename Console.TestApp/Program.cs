@@ -1,5 +1,6 @@
 ﻿using EasyMapper;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Test.Common;
@@ -21,7 +22,21 @@ namespace Console.TestApp
             {
                 SupplierID = s.SupplierID,
                 CompanyName = s.CompanyName,
-                Product = s.Products.FirstOrDefault(),
+                Product = s.Products.Select(sp => new Product
+                {
+                    Category = sp.Category,
+                    CategoryID = sp.CategoryID,
+                    ProductName = sp.ProductName,
+                    Discontinued = sp.Discontinued,
+                    ProductID = sp.ProductID,
+                    QuantityPerUnit = sp.QuantityPerUnit,
+                    ReorderLevel = sp.ReorderLevel,
+                    Supplier = sp.Supplier,
+                    SupplierID = sp.SupplierID,
+                    UnitPrice = sp.UnitPrice,
+                    UnitsInStock = sp.UnitsInStock,
+                    UnitsOnOrder = sp.UnitsOnOrder
+                }).FirstOrDefault(),
             }).ToList();
             categories = query.GetCategoryList();
             products = query.GetProductList();
@@ -69,20 +84,20 @@ namespace Console.TestApp
             var categoryList = categories.ToMap<CategoryDto>().ToList(); // Status : 
 
             //------------------
-            var opt = new MapOptions(GenerationLevel.Eighth, "Id");
-            var opt2 = MapOption.GetDefaultOptions();
-            var opt3 = MapOptions.GetDefaultOptions();
+            var opt = new MapOptions().GetDefaultOptions();
+
             // EasyMapping (Single entity Inline Single entity)
             var singleTestDto2 = singleTestEntity.ToMap<SupplierSingleTestDto>(opt); // Status : 
 
             // EasyMapping (List entity Inline Single entity)
             var listTestDto2 = products.ToMap<ProductDto>(opt).ToList(); // Status : 
 
+            var opt8 = new MapOptions(GenerationLevel.Eighth, "SupplierID");
             // EasyMapping (List entity Inline Single entity)
-            var supplierDto2 = singleTestListEntities.ToMap<SupplierDto>(opt); // Status : 
+            var supplierDto2 = singleTestListEntities.ToMap<SupplierDto>(opt8); // Status : 
 
             // EasyMapping (List entity Inline List entity)
-            var categoryList2 = categories.ToMap<CategoryDto>(opt).ToList(); // Status : 
+            var categoryList2 = categories.ToMap<CategoryDto>(opt8).ToList(); // Status : 
 
             // Data in UI
             foreach (var category in categoryList)
@@ -132,8 +147,14 @@ namespace Console.TestApp
                 .FirstOrDefault();
 
             var singleTestDto9 = new Sql().Context.Suppliers.Include(i => i.Products)
-                .Select(s => s.ToMap<SupplierTestDto>(opt))
+                .Select(s => s.ToMap<SupplierTestDto>(opt8))
                 .FirstOrDefault();
+
+            var productTest = new Sql().Context.Products.ToMap<ProductDto>().ToList();
+            var productTest2 = new Sql().Context.Products.Include("Category").ToMap<ProductDto>().ToList();
+            var productTest3 = new Sql().Context.Products.Include("Category").ToMap<ProductDto>(opt8).ToList();
+
+            var testProductInstance = new Object().ToMap<ProductDto>(); // No Error, CreateInstance Success!
 
             #endregion
 

@@ -12,35 +12,28 @@
         /// <see href="EN"/> : Fields that should not match. | 
         /// <see href="TR"/> : Eşleşmemesi gereken alanlar.
         /// </summary>
-        private string[] IgnoreFields { get; set; } = new string[0];
+        public string[] IgnoreFields { get; set; } = new string[0];
+
+        public MapOptions() { }
 
         public MapOptions(GenerationLevel generationLevel, params string[] ignoreFields)
         {
             GenerationLevel = generationLevel;
             IgnoreFields = ignoreFields;
         }
-        public MapOptions() { }
 
-        private void DefaultOptions(out GenerationLevel level, out string[] ignoreds)
+        public MapOptions GetDefaultOptions() => this;
+
+        public MapOptions GetSecondLevelAndNonIgnoreOptions()
         {
-            level = GenerationLevel.First;
-            ignoreds = new string[0];
+            GenerationLevel = GenerationLevel.Second;
+            return this;
         }
 
-        //public static MapOptions GetDefaultOptions()
-        //{
-        //    var mo = new MapOptions();
-        //    DefaultOptions(ref mo.GenerationLevel, ref out mo.IgnoreFields);
-        //    return mo;
-        //}
-    }
-
-    public class MapOption
-    {
-        public static MapOptions GetDefaultOptions()
-            => new MapOptions(GenerationLevel.First, new string[0]);
-
-        public static MapOptions GetThirdLevelAndNonIgnoreOptions()
-            => new MapOptions(GenerationLevel.Third, new string[0]);
+        public MapOptions GetThirdLevelAndNonIgnoreOptions()
+        {
+            GenerationLevel = GenerationLevel.Third;
+            return this;
+        }
     }
 }

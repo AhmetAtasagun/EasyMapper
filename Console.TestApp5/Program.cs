@@ -115,6 +115,10 @@ namespace Console.TestApp5
                 .Select(s => s.ToMap<SupplierTestDto>()) // Status : 
                 .FirstOrDefault();
 
+            var singleTestDto9 = new Sql().Context.Suppliers.Include(i => i.Products)
+                .Select(s => s.ToMap(typeof(SupplierTestDto))) // Status : 
+                .FirstOrDefault();
+
             #endregion
 
             System.Console.WriteLine("In Query Data Mapping Completed!");
