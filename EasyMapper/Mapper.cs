@@ -109,11 +109,16 @@ namespace EasyMapper
                 #endregion
                 if (!sourceProperty.PropertyType.AssemblyQualifiedName.StartsWith("System")) // Tek Model tip için
                 {
+                    if (sourceProperty.PropertyType.BaseType.Name == nameof(Enum))
+                        if (destinationProperty.PropertyType.Name == sourceProperty.GetType().Name)
+                        {
+                            destinationProperty.SetValue(destionationEntity, sourceProperty); continue;
+                        }
                     if (options.GenerationLevel < innerLevel) continue;
                     var innerDestination = Activator.CreateInstance(destinationProperty.PropertyType);
                     innerDestination = NewInstanceMap(value, destionationType, innerDestination.GetType(), options, ++innerLevel); innerLevel--;
                     if (destinationProperty.PropertyType.Name == innerDestination.GetType().Name)
-                        destinationProperty.SetValue(destionationEntity, innerDestination); continue;
+                        destinationProperty.SetValue(destionationEntity, innerDestination);
                 }
                 else if (destinationProperty.PropertyType.FullName.Contains("Generic") && destinationProperty.PropertyType.FullName.Contains("List") &&
                     sourceProperty.PropertyType.FullName.Contains("Generic") && sourceProperty.PropertyType.FullName.Contains("List")) // Liste Model tip için
@@ -128,10 +133,13 @@ namespace EasyMapper
                         destinationItem = NewInstanceMap(sourceItem, destionationType, innerDestinationItemType, options, ++innerLevel); innerLevel--;
                         innerDestinationEnumerable.Add(destinationItem);
                     }
-                    destinationProperty.SetValue(destionationEntity, innerDestinationEnumerable); continue;
+                    destinationProperty.SetValue(destionationEntity, innerDestinationEnumerable);
                 }
                 else if (destinationProperty.PropertyType.Name == sourceProperty.PropertyType.Name) // basit veri tipi için
                     destinationProperty.SetValue(destionationEntity, value);
+                else if (destinationProperty.PropertyType.FullName.Contains(sourceProperty.PropertyType.Name)) // basit veri tipi için (nullable a setleme)
+                    try { destinationProperty.SetValue(destionationEntity, value); }
+                    catch (Exception) { }
                 // else (daha sonra türden türe dönüşüm işlemlerine bakılacak.)
             }
             return destionationEntity;

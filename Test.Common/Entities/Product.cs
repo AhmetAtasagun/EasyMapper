@@ -20,6 +20,6 @@ namespace Test.Common
         public Int16 UnitsInStock { get; set; }
         public Int16 UnitsOnOrder { get; set; }
         public Int16 ReorderLevel { get; set; }
-        public bool Discontinued { get; set; }
+        public bool? Discontinued { get; set; }
     }
 }

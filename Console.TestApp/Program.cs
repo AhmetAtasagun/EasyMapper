@@ -61,7 +61,7 @@ namespace Console.TestApp
                     ProductName = singleTestEntity.Product.ProductName,
                     UnitsInStock = singleTestEntity.Product.UnitsInStock,
                     UnitPrice = singleTestEntity.Product.UnitPrice,
-                    Discontinued = singleTestEntity.Product.Discontinued,
+                    Discontinued = singleTestEntity.Product.Discontinued.GetValueOrDefault(),
                     QuantityPerUnit = singleTestEntity.Product.QuantityPerUnit,
                     ReorderLevel = singleTestEntity.Product.ReorderLevel,
                     UnitsOnOrder = singleTestEntity.Product.UnitsOnOrder,
