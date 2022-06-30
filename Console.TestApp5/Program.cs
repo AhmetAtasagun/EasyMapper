@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using Test.Common;
+using Test.Common.Dtos;
+using Test.Common.Entities;
 
 namespace Console.TestApp5
 {
@@ -21,7 +23,7 @@ namespace Console.TestApp5
             {
                 SupplierID = s.SupplierID,
                 CompanyName = s.CompanyName,
-                Product = s.Products.FirstOrDefault(),
+                Product = s.Products.FirstOrDefault()
             }).Take(3).ToList();
             categories = query.GetCategoryList();
             products = query.GetProductList();
@@ -46,7 +48,7 @@ namespace Console.TestApp5
                     ProductName = singleTestEntity.Product.ProductName,
                     UnitsInStock = singleTestEntity.Product.UnitsInStock,
                     UnitPrice = singleTestEntity.Product.UnitPrice,
-                    Discontinued = singleTestEntity.Product.Discontinued,
+                    Discontinued = singleTestEntity.Product.Discontinued.GetValueOrDefault(),
                     QuantityPerUnit = singleTestEntity.Product.QuantityPerUnit,
                     ReorderLevel = singleTestEntity.Product.ReorderLevel,
                     UnitsOnOrder = singleTestEntity.Product.UnitsOnOrder,

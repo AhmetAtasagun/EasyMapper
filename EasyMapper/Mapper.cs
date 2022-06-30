@@ -137,7 +137,8 @@ namespace EasyMapper
                 }
                 else if (destinationProperty.PropertyType.Name == sourceProperty.PropertyType.Name) // basit veri tipi için
                     destinationProperty.SetValue(destionationEntity, value);
-                else if (destinationProperty.PropertyType.FullName.Contains(sourceProperty.PropertyType.Name)) // basit veri tipi için (nullable a setleme)
+                else if (destinationProperty.PropertyType.FullName.Contains(sourceProperty.PropertyType.Name) ||
+                    sourceProperty.PropertyType.FullName.Contains(destinationProperty.PropertyType.Name)) // basit veri tipi için (nullable a setleme)
                     try { destinationProperty.SetValue(destionationEntity, value); }
                     catch (Exception) { }
                 // else (daha sonra türden türe dönüşüm işlemlerine bakılacak.)

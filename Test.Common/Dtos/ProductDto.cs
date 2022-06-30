@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Test.Common
+namespace Test.Common.Dtos
 {
     public class ProductDto
     {

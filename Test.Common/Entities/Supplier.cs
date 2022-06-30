@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Test.Common
+namespace Test.Common.Entities
 {
     public class Supplier
     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Test.Common
+namespace Test.Common.Dtos
 {
     public class CategoryDto
     {

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Test.Common
+﻿namespace Test.Common.Dtos
 {
     public class SupplierSingleTestDto
     {
