@@ -2,6 +2,16 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageId>Atasagun.Utilities.EasyMapper</PackageId>
+    <Authors>Ahmet Atasagun</Authors>
+    <Company>Atasagun</Company>
+    <Product>EasyMapper</Product>
+    <PackageProjectUrl></PackageProjectUrl>
+    <RepositoryUrl>https://github.com/AhmetAtasagun/EasyMapper</RepositoryUrl>
+    <PackageTags>easy, map, mapper, mapping</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+    <Description>A simplify model map tool</Description>
   </PropertyGroup>
 
 </Project>
