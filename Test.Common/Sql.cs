@@ -57,5 +57,10 @@ namespace Test.Common
                 return products;
             }
         }
+
+        public bool UpdateSimulate<T>(T entitiy)
+        {
+            return true;
+        }
     }
 }

@@ -70,6 +70,7 @@ namespace Console.TestApp
                 };
                 var employee = employees.First();
                 var newEmployee = paramEmployee.ToMap(employee);
+                new Sql().UpdateSimulate(newEmployee); // Update ettik
                 TestUI.MatchOldAndNewData(employee, newEmployee);
             });
         }
