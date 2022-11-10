@@ -32,7 +32,7 @@ namespace Console.TestApp
             {
                 var entityProducts = products.Take(3).ToList();
                 var dtoProducts = entityProducts.ToMap<ProductDto>().ToList();
-                TestUI.MatchOldAndNewData(entityProducts, dtoProducts);
+                TestUI.MatchOldAndNewDatas(entityProducts, dtoProducts);
             });
         }
 
@@ -46,19 +46,29 @@ namespace Console.TestApp
             });
         }
 
-        public void EmployeesToEmployeesDto()
+        public void ListOfEmployeesToEmployeesDto()
         {
             testUI.Run("Case 3", () =>
             {
-                var employees3 = employees.ToList();
+                var employees3 = employees.Take(3).ToList();
                 var employeeDtos = employees3.ToMap<EmployeeDto>().ToList();
-                TestUI.MatchOldAndNewData(employees3, employeeDtos);
+                TestUI.MatchOldAndNewDatas(employees3, employeeDtos);
+            });
+        }
+
+        public void ListOfSupplierToSupplierDto()
+        {
+            testUI.Run("Case 4", () =>
+            {
+                var entityProducts = suppliers.Skip(5).Take(3).ToList();
+                var dtoProducts = entityProducts.ToMap<SupplierDto>();
+                TestUI.MatchOldAndNewDatas(entityProducts, dtoProducts);
             });
         }
 
         public void EmployeeUpdateToEmployeeDto()
         {
-            testUI.Run("Case 4", () =>
+            testUI.Run("Case 5", () =>
             {
                 var paramEmployee = new EmployeeDto
                 {
@@ -70,16 +80,8 @@ namespace Console.TestApp
                 };
                 var employee = employees.First();
                 var newEmployee = paramEmployee.ToMap(employee);
-                new Sql().UpdateSimulate(newEmployee); // Update ettik
+                Sql.UpdateSimulate(newEmployee); // Update ettik
                 TestUI.MatchOldAndNewData(employee, newEmployee);
-            });
-        }
-
-        public void Func5()
-        {
-            testUI.Run("Case 5", () =>
-            {
-
             });
         }
 
@@ -100,6 +102,7 @@ namespace Console.TestApp
             action();
             FinishInfo(methodName);
         }
+
         public static void StartInfo(string methodName)
         {
             System.Console.WriteLine($"\n{methodName} is started...");
@@ -110,23 +113,24 @@ namespace Console.TestApp
             System.Console.WriteLine($"{methodName} is finished.\n");
         }
 
-        public static void MatchOldAndNewData<TEntity, TDto>(List<TEntity> entitesList, List<TDto> dtosList)
+        public static void MatchOldAndNewDatas<TEntity, TDto>(IEnumerable<TEntity> entitesList, IEnumerable<TDto> dtosList)
         {
             var titleColumn = 3;
             var dataColum = 30;
-            var rightColumnStart = 60;
-            for (int i = 0; i < entitesList.Count; i++)
+            var rightColumnStart = 90;
+            for (int i = 0; i < entitesList.Count(); i++)
             {
                 System.Console.WriteLine("");
-                var props = entitesList[i].GetType().GetProperties();
-                var mapProps = dtosList[i].GetType().GetProperties();
-                ConsoleSetColumAndWrite(dataColum, $"*** {props[i].DeclaringType.Name} ***");
-                ConsoleSetColumAndWriteLine(rightColumnStart, $"*** {mapProps[i].DeclaringType.Name} ***");
-                for (int j = 0; j < props.Length; j++)
+                var props = entitesList.ElementAt(i).GetType().GetProperties();
+                var mapProps = dtosList.ElementAt(i).GetType().GetProperties();
+                ConsoleSetColumAndWrite(dataColum, $"*** {entitesList.ElementAt(i).GetType().Name} ***");
+                ConsoleSetColumAndWriteLine(rightColumnStart, $"*** {dtosList.ElementAt(i).GetType().Name} ***");
+                foreach (var prop in props)
                 {
-                    ConsoleSetColumAndWrite(titleColumn, $"{props[j].Name} : ");
-                    ConsoleSetColumAndWrite(dataColum, $"{props[j].GetValue(entitesList[i])}");
-                    ConsoleSetColumAndWriteLine(rightColumnStart, $"{mapProps[j].GetValue(dtosList[i])}");
+                    ConsoleSetColumAndWrite(titleColumn, $"{prop.Name} : ");
+                    ConsoleSetColumAndWrite(dataColum, $"{prop.GetValue(entitesList.ElementAt(i))}");
+                    var dtoProp = mapProps.FirstOrDefault(x => x.Name == prop.Name);
+                    ConsoleSetColumAndWriteLine(rightColumnStart, $"{dtoProp.GetValue(dtosList.ElementAt(i))}");
                 }
             }
         }
@@ -141,11 +145,12 @@ namespace Console.TestApp
             var mapProps = dto.GetType().GetProperties();
             ConsoleSetColumAndWrite(dataColum, $"*** {entity.GetType().Name} ***");
             ConsoleSetColumAndWriteLine(rightColumnStart, $"*** {dto.GetType().Name} ***");
-            for (int j = 0; j < props.Length; j++)
+            foreach (var prop in props)
             {
-                ConsoleSetColumAndWrite(titleColumn, $"{props[j].Name} : ");
-                ConsoleSetColumAndWrite(dataColum, $"{props[j].GetValue(entity)}");
-                ConsoleSetColumAndWriteLine(rightColumnStart, $"{mapProps[j].GetValue(dto)}");
+                ConsoleSetColumAndWrite(titleColumn, $"{prop.Name} : ");
+                ConsoleSetColumAndWrite(dataColum, $"{prop.GetValue(entity)}");
+                var dtoProp = mapProps.FirstOrDefault(x => x.Name == prop.Name);
+                ConsoleSetColumAndWriteLine(rightColumnStart, $"{dtoProp.GetValue(dto)}");
             }
         }
 

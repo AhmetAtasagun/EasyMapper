@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Linq;
 using System.Reflection;
 
@@ -10,22 +9,26 @@ namespace Console.TestApp
         static void Main(string[] args)
         {
             #region Index
-            System.Console.WriteLine(@"
+            var appVersion = Assembly.GetExecutingAssembly().CustomAttributes
+                .Where(w => w.AttributeType.Name.Contains("TargetFramework")).FirstOrDefault()
+                .ConstructorArguments.FirstOrDefault().Value;
+            System.Console.WriteLine($@"
            ____________________________________                
            |                                  |
            |    EasyMapper Test Programına    |
-           |           Hoşgeldiniz            |
-           |        (dotnet core 3.1)         |
+           |           Hoşgeldiniz            |                    
            |__________________________________|
+           Framework : {appVersion}
+
 Çalıştırmak istediğiniz Test Fonksiyon Numarasını yazınız.
 ");
             #endregion
             var testClass = new Test();
             var methods = ((TypeInfo)testClass.GetType()).DeclaredMethods
-                .Where(w => !w.Name.Contains("<") && !w.Name.Contains("<")).ToList();
+                /*.Where(w => !w.Name.Contains("<") && !w.Name.Contains(">"))*/.ToList();
             while (true)
             {
-                for (int i = 0; i < methods.Count(); i++)
+                for (int i = 0; i < methods.Count; i++)
                 {
                     System.Console.WriteLine($"{i + 1}. {methods[i].Name}");
                 }

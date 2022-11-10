@@ -58,7 +58,7 @@ namespace Test.Common
             }
         }
 
-        public bool UpdateSimulate<T>(T entitiy)
+        public static bool UpdateSimulate<T>(T entitiy)
         {
             return true;
         }

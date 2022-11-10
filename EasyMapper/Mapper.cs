@@ -82,7 +82,6 @@ namespace EasyMapper
 
         private static TDestination ValuesUpdateMap<TDestination>(object source, TDestination destinationInstance, MapOptions options = null)
         {
-            //var newDestinationInstance = GetInstanceBy<TDestination>(destinationInstance.GetType().AssemblyQualifiedName);
             var newDestinationInstance = NewInstanceMap<TDestination>(destinationInstance, options);
             newDestinationInstance = (TDestination)MapEntityProperties(source, newDestinationInstance, isUpdateMap: true, options: options);
             return newDestinationInstance;
@@ -91,16 +90,20 @@ namespace EasyMapper
         private static object MapEntityProperties(object source, object destionationEntity, Type destionationType = null, bool isUpdateMap = false,
             MapOptions options = null, GenerationLevel innerLevel = GenerationLevel.First)
         {
+            if (source == null) return source;
+            if (source.GetType().BaseType.Name == destionationEntity.GetType().BaseType.Name)
+            { destionationEntity = source; return destionationEntity; }
             if (options == null) options = new MapOptions().GetDefaultOptions();
             PropertyInfo[] sourceProperties = source.GetType().GetProperties();
             foreach (var sourceProperty in sourceProperties)
             {
                 var currentPropertyName = sourceProperty.Name;
-                if (options.IgnoreFields.Contains(currentPropertyName)) continue;
+                if (options.IgnoreFields.Contains(currentPropertyName))
+                    continue;
                 var value = GetPropertyValue(source, currentPropertyName);
                 if (value is null)
                     continue;
-                var destinationProperty = destionationEntity.GetType().GetProperty(currentPropertyName); // GetDestinationProperty(destionationEntity, currentPropertyName);
+                var destinationProperty = destionationEntity.GetType().GetProperty(currentPropertyName);
                 if (destinationProperty == null)
                     continue;
                 #region For Update Method
@@ -112,25 +115,30 @@ namespace EasyMapper
                     if (sourceProperty.PropertyType.BaseType.Name == nameof(Enum))
                         if (destinationProperty.PropertyType.Name == sourceProperty.GetType().Name)
                         {
-                            destinationProperty.SetValue(destionationEntity, sourceProperty); continue;
+                            destinationProperty.SetValue(destionationEntity, sourceProperty);
+                            continue;
                         }
-                    if (options.GenerationLevel < innerLevel) continue;
+                    if (options.GenerationLevel < innerLevel)
+                        continue;
                     var innerDestination = Activator.CreateInstance(destinationProperty.PropertyType);
-                    innerDestination = NewInstanceMap(value, destionationType, innerDestination.GetType(), options, ++innerLevel); innerLevel--;
+                    innerDestination = NewInstanceMap(value, destionationType, innerDestination.GetType(), options, ++innerLevel);
+                    innerLevel--;
                     if (destinationProperty.PropertyType.Name == innerDestination.GetType().Name)
                         destinationProperty.SetValue(destionationEntity, innerDestination);
                 }
                 else if (destinationProperty.PropertyType.FullName.Contains("Generic") && destinationProperty.PropertyType.FullName.Contains("List") &&
                     sourceProperty.PropertyType.FullName.Contains("Generic") && sourceProperty.PropertyType.FullName.Contains("List")) // Liste Model tip için
                 {
-                    if (options.GenerationLevel < innerLevel) continue;
+                    if (options.GenerationLevel < innerLevel)
+                        continue;
                     var innerDestinationEnumerable = (IList)Activator.CreateInstance(destinationProperty.PropertyType);
                     var innerDestinationItemType = destinationProperty.PropertyType.GenericTypeArguments.FirstOrDefault();
                     var sourceValueEnumerable = (IList)value;
                     foreach (var sourceItem in sourceValueEnumerable)
                     {
                         var destinationItem = Activator.CreateInstance(destinationProperty.PropertyType.GenericTypeArguments.FirstOrDefault());
-                        destinationItem = NewInstanceMap(sourceItem, destionationType, innerDestinationItemType, options, ++innerLevel); innerLevel--;
+                        destinationItem = NewInstanceMap(sourceItem, destionationType, innerDestinationItemType, options, ++innerLevel);
+                        innerLevel--;
                         innerDestinationEnumerable.Add(destinationItem);
                     }
                     destinationProperty.SetValue(destionationEntity, innerDestinationEnumerable);
@@ -163,38 +171,6 @@ namespace EasyMapper
             return destinationInstance;
         }
 
-        #region V2 preinitialized....
-        //private static PropertyInfo GetDestinationProperty(object destionationEntity, string currentPropertyName)
-        //{
-        //    var destinationProperty = destionationEntity.GetType().GetProperty(currentPropertyName);
-        //    if (destinationProperty == null)
-        //        destinationProperty = destionationEntity.GetType().GetProperty(GetPluralName(currentPropertyName));
-        //    if (destinationProperty == null)
-        //        destinationProperty = destionationEntity.GetType().GetProperty(GetSingularName(currentPropertyName));
-        //    return destinationProperty;
-        //}
-
-        //private static string GetPluralName(string propertyName)
-        //{
-        //    if (propertyName.EndsWith("s"))
-        //        return propertyName + "es";
-        //    else if (propertyName.EndsWith("y"))
-        //        return propertyName.Substring(0, propertyName.Length - 1) + "ies";
-        //    else if (propertyName.EndsWith("x"))
-        //        return propertyName;
-        //    else return propertyName + "s";
-        //}
-
-        //private static string GetSingularName(string propertyName)
-        //{
-        //    if (propertyName.EndsWith("ies"))
-        //        return propertyName.Substring(0, propertyName.Length - 3) + "y";
-        //    else if (propertyName.EndsWith("x"))
-        //        return propertyName;
-        //    else return propertyName.TrimEnd('s');
-        //} 
-        #endregion
-
         private static object GetPropertyValue(object source, string propName)
         {
             if (source == null) throw new ArgumentException("Value cannot be null.", nameof(source));
@@ -217,3 +193,12 @@ namespace EasyMapper
         #endregion
     }
 }
+#region Notlar
+/**** Satır 13-37 => .ToList().AsEnumerable();
+ * ToList Kullanım nedeni : select işlem sonrası execute tetiklenme ihtiyacından kaynaklanmaktadır. Özellikle Context üzerinden veri çekme işlemleri sırasında 
+ *  sınıf içerisindeki model tip propertyleri yüklememekte, bazı durumlarda ise query üzerine query yazıldığında nesne takibinde sorun yaşanmaktan kaynaklanmaktadır.    
+ * AsEnumerable Kullanım nedeni : ToList kullanım sonası tip uyuşmazlığını gidermek içindir.
+ * 
+ **** 
+ */
+#endregion
