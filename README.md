@@ -23,11 +23,10 @@ Bu kütüphane, kodlama öncesi ön yapılandırmalardan kurtulmak ve yazım kol
 ### **Add to Project**
 ---
 
-Nuget Package Manager > Search : "EasyMapper"<br>
+Nuget Package Manager > Search : "Utilities.EasyMapper"<br>
 Select EasyMapper library and install right side
 &nbsp;<br>
 &nbsp;<br>
-Note : Not Avaible, Incoming...
 &nbsp;<br>
 &nbsp;<br>
 &nbsp;<br>
