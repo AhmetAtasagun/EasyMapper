@@ -26,6 +26,9 @@ Bu kütüphane, kodlama öncesi ön yapılandırmalardan kurtulmak ve yazım kol
 Nuget Package Manager > Search : "Utilities.EasyMapper"<br>
 Select EasyMapper library and install right side
 &nbsp;<br>
+<a href="https://www.nuget.org/packages/Atasagun.Utilities.EasyMapper" target="_blank">
+    ![Static Badge](https://img.shields.io/badge/Nuget-V.1.0.1-blue)
+</a>
 &nbsp;<br>
 &nbsp;<br>
 &nbsp;<br>
